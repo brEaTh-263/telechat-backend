@@ -50,10 +50,11 @@ router.post("/authenticate-phonenumber", async (req, res) => {
 			throw new Error();
 		}
 
-		let user = new User({ phoneNumber: phoneNumber, name: name });
-		user = await user.save();
+		let user = new User({ phoneNumber, name });
+		await user.save();
+		console.log(user);
 		const token = user.generateAuthToken();
-		return res.status(200).send({ token });
+		return res.status(200).send({ token, _id: user._id });
 	} catch (error) {
 		console.log(error);
 		return res.status(505).send("Something went wrong");
