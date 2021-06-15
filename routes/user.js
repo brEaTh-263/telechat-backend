@@ -2,8 +2,9 @@ const express = require("express");
 const { User } = require("../models/user");
 const router = express.Router();
 const _ = require("lodash");
+const auth = require("../middlewares/auth");
 
-router.post("/search-user", async (req, res) => {
+router.post("/search-user", auth, async (req, res) => {
 	const { query } = req.body;
 	if (!query) {
 		return res.status(400).send({ Error: "Something went wrong" });

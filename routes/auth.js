@@ -2,6 +2,7 @@ const { User } = require("../models/user");
 const express = require("express");
 const _ = require("lodash");
 const { accountSid, authToken, serviceSid } = require("../config");
+const auth = require("../middlewares/auth");
 const router = express.Router();
 const client = require("twilio")(accountSid, authToken);
 
@@ -58,6 +59,19 @@ router.post("/authenticate-phonenumber", async (req, res) => {
 	} catch (error) {
 		console.log(error);
 		return res.status(505).send("Something went wrong");
+	}
+});
+
+router.get("/autoLogIn", auth, async (req, res) => {
+	const { _id } = req.user;
+	try {
+		let user = await User.findById(_id);
+		const token = user.generateAuthToken();
+		const details = _.pick(user, ["name", "displayPicture"]);
+		return res.status(200).send({ token, _id: user._id, details });
+	} catch (error) {
+		console.log(error);
+		return res.status(500).send({ Error: "Something went wrong" });
 	}
 });
 
