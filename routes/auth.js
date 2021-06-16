@@ -38,7 +38,7 @@ router.post("/authenticate-phonenumber", async (req, res) => {
 	if (!phoneNumber || !code || !name) {
 		return res.status(400).send("Something went wrong");
 	}
-	console.log(code, phoneNumber);
+
 	try {
 		const data = await client.verify
 			.services(serviceSid)
@@ -55,7 +55,8 @@ router.post("/authenticate-phonenumber", async (req, res) => {
 		await user.save();
 		console.log(user);
 		const token = user.generateAuthToken();
-		return res.status(200).send({ token, _id: user._id });
+		const details = _.pick(user, ["name", "displayPicture"]);
+		return res.status(200).send({ token, _id: user._id, details });
 	} catch (error) {
 		console.log(error);
 		return res.status(505).send("Something went wrong");
