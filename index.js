@@ -74,7 +74,10 @@ io.use(async (socket, next) => {
 io.on("connection", (socket) => {
 	console.log("User connected" + socket.id);
 	socket.on("disconnect", () => {
-		if (socket.roomId) socket.leave(socket.roomId.toString());
+		if (socket.roomId) {
+			socket.leave(socket.roomId.toString());
+			socket.removeAllListeners();
+		}
 		console.log("User disconnected");
 	});
 
@@ -145,7 +148,11 @@ io.on("connection", (socket) => {
 		console.log(room);
 		room.messages.push(content);
 		await room.save();
-		socket.in(socket.roomId.toString()).emit("private message", {
+		let clients = io.sockets.adapter.rooms.get(socket.roomId.toString());
+
+		console.log("All members");
+		console.log(clients);
+		socket.to(socket.roomId.toString()).emit("private message", {
 			content: content,
 			from: socket._id,
 		});
