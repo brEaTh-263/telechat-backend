@@ -21,6 +21,10 @@ const userSchema = mongoose.Schema({
 		type: String,
 		default: "",
 	},
+	pushToken: {
+		type: String,
+		default: "",
+	},
 });
 
 userSchema.methods.generateAuthToken = function () {

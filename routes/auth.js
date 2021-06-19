@@ -6,6 +6,28 @@ const auth = require("../middlewares/auth");
 const router = express.Router();
 const client = require("twilio")(accountSid, authToken);
 
+router.post("/push-token", auth, async (req, res) => {
+	try {
+		let { pushToken } = req.body;
+		if (!pushToken) {
+			return res.status(400).send({ Error: "Something went wrong" });
+		}
+		const { _id } = req.user;
+		const user = await User.findByIdAndUpdate(_id, {
+			$set: {
+				pushToken: pushToken,
+			},
+		});
+		if (!user) {
+			return res.status(400).send({ Error: "Something went wrong" });
+		}
+		return res.status(200).send({ success: "Token Received" });
+	} catch (error) {
+		console.log(error);
+		return res.status(400).send({ Error: "Something went wrong" });
+	}
+});
+
 router.post("/sign-in", async (req, res) => {
 	let { phoneNumber } = req.body;
 	if (!phoneNumber) {
@@ -28,6 +50,7 @@ router.post("/sign-in", async (req, res) => {
 				res.status(400).send({ Error: "Something went wrong" });
 			});
 	} catch (error) {
+		console.log(error);
 		return res.status(505).send(err.message);
 	}
 });

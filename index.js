@@ -20,6 +20,7 @@ mongoose.connect(
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
 		useCreateIndex: true,
+		useFindAndModify: false,
 	},
 	() => {
 		console.log("Connected to mongoose");
@@ -73,6 +74,7 @@ io.use(async (socket, next) => {
 
 io.on("connection", (socket) => {
 	console.log("User connected" + socket.id);
+	// console.log("User connected" + socket._id);
 	socket.on("disconnect", () => {
 		if (socket.roomId) {
 			socket.leave(socket.roomId.toString());
@@ -149,7 +151,6 @@ io.on("connection", (socket) => {
 		room.messages.push(content);
 		await room.save();
 		let clients = io.sockets.adapter.rooms.get(socket.roomId.toString());
-
 		console.log("All members");
 		console.log(clients);
 		socket.to(socket.roomId.toString()).emit("private message", {
