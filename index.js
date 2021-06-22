@@ -97,6 +97,7 @@ io.on("connection", (socket) => {
 				x.push(newuser);
 				newuser = await User.findById(room.userIds[1]);
 				x.push(newuser);
+				room.messages.reverse();
 
 				return {
 					_id: room._id,
