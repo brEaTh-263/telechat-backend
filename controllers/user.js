@@ -16,3 +16,26 @@ exports.searchForUser = async (req, res) => {
 	});
 	return res.status(200).send(editedUsers);
 };
+
+exports.editMyDisplayPicture = async (req, res) => {
+	try {
+		const { _id } = req.user;
+		let user = await User.findById(_id);
+		if (!user) {
+			return res
+				.status(404)
+				.send({ Error: "User with given id was not found!" });
+		}
+		user.displayPicture = req.file.location;
+		await user.save();
+
+		return res
+			.status(200)
+			.send({
+				status: "Display picture added",
+				displayPicture: user.displayPicture,
+			});
+	} catch (error) {
+		return res.status(505).send({ Error: "Something went wrong" });
+	}
+};
