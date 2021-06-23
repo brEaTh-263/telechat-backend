@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const http = require("http");
@@ -9,16 +10,15 @@ const authRouter = require("./routes/auth");
 const userRouter = require("./routes/user");
 const { Server } = require("socket.io");
 const io = new Server(server);
-const { mongoDbURI } = require("./config");
+const { getMyChats, sendMessage, getRoomChats } =
+	require("./handlers/user")(io);
+const { connectMeToRoom, disconnectRoom } = require("./handlers/room")(io);
 
 app.use(bodyParser.json());
 app.use("/auth", authRouter);
 app.use("/user", userRouter);
-const { getMyChats, sendMessage, getRoomChats } =
-	require("./handlers/user")(io);
-const { connectMeToRoom, disconnectRoom } = require("./handlers/room")(io);
 mongoose.connect(
-	`${mongoDbURI}`,
+	process.env.mongoDbURI,
 	{
 		useNewUrlParser: true,
 		useUnifiedTopology: true,

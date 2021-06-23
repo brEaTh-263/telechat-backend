@@ -1,5 +1,4 @@
-const { accountSid, authToken, serviceSid } = require("../config");
-const client = require("twilio")(accountSid, authToken);
+const client = require("twilio")(process.env.accountSid, process.env.authToken);
 const _ = require("lodash");
 const { User } = require("../models/user");
 
@@ -10,7 +9,7 @@ exports.signInUser = async (req, res) => {
 	}
 	try {
 		client.verify
-			.services(serviceSid)
+			.services(process.env.serviceSid)
 			.verifications.create({
 				to: `+91${phoneNumber}`,
 				channel: "sms",
@@ -39,7 +38,7 @@ exports.createUserWithGivenOtp = async (req, res) => {
 
 	try {
 		const data = await client.verify
-			.services(serviceSid)
+			.services(process.env.serviceSid)
 			.verificationChecks.create({
 				to: `+91${phoneNumber}`,
 				code: req.body.code,
