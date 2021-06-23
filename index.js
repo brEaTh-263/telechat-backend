@@ -10,12 +10,12 @@ const userRouter = require("./routes/user");
 const { Server } = require("socket.io");
 const io = new Server(server);
 const { mongoDbURI } = require("./config");
-const { Room } = require("./models/room");
 
 app.use(bodyParser.json());
 app.use("/auth", authRouter);
 app.use("/user", userRouter);
-const { getMyChats, sendMessage } = require("./handlers/user")(io);
+const { getMyChats, sendMessage, getRoomChats } =
+	require("./handlers/user")(io);
 const { connectMeToRoom, disconnectRoom } = require("./handlers/room")(io);
 mongoose.connect(
 	`${mongoDbURI}`,
@@ -50,6 +50,7 @@ io.on("connection", (socket) => {
 
 	socket.on("get_my_chats", getMyChats);
 	socket.on("connect_me_to_room", connectMeToRoom);
+	socket.on("chats", getRoomChats);
 	socket.on("private message", sendMessage);
 	socket.on("disconnectRoom", disconnectRoom);
 });

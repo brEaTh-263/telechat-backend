@@ -28,6 +28,13 @@ module.exports = (io) => {
 		io.to(socket.id).emit("your_rooms", populatedRooms);
 	};
 
+	const getRoomChats = async function ({ roomId }) {
+		const socket = this;
+		const room = await Room.findById(roomId);
+		room.messages.reverse();
+		socket.emit("room_chats", { messages: room.messages, roomId });
+	};
+
 	const sendMessage = async function ({ content, to }) {
 		const socket = this;
 		const room = await Room.findById(socket.roomId);
@@ -37,7 +44,8 @@ module.exports = (io) => {
 		const user = await User.findById(to);
 		const { pushToken, name } = user;
 		let messages = [];
-		if (pushToken) {
+		let roomSize = io.sockets.adapter.rooms.get(socket.roomId.toString()).size;
+		if (pushToken && roomSize === 1) {
 			if (!Expo.isExpoPushToken(pushToken)) {
 				console.error(`Push token ${pushToken} is not a valid Expo push token`);
 				return;
@@ -90,5 +98,6 @@ module.exports = (io) => {
 	return {
 		getMyChats,
 		sendMessage,
+		getRoomChats,
 	};
 };
